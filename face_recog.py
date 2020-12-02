@@ -23,20 +23,20 @@ def name_to_color(name):
     color = [(ord(c.lower())-97)*8 for c in name[:3]]
     return color
 
-def convert_to_png(path):
-    print('Checking for compatible image extensions')
-    dirs = os.listdir(path)
-    for item in dirs:
-        print("I am in ", item)
-        im = Image.open(path+item)
-        f, e = os.path.splitext(path+item)
-        print("E is = ", e)
-        if(e == '.JPG' or e == '.JPEG' or e == '.jpg' or e == '.jpeg'):
-            print('JPEG FOUND')
-            rgb_im = im.convert('RGB')
-            os.remove(f+e)
-            rgb_im.save(f+'.png')
-        # resized.save(f + 'new', 'JPEG', quality=90)
+# def convert_to_png(path):
+#     print('Checking for compatible image extensions')
+#     dirs = os.listdir(path)
+#     for item in dirs:
+#         print("I am in ", item)
+#         im = Image.open(path+item)
+#         f, e = os.path.splitext(path+item)
+#         print("E is = ", e)
+#         if(e == '.JPG' or e == '.JPEG' or e == '.jpg' or e == '.jpeg'):
+#             print('JPEG FOUND')
+#             rgb_im = im.convert('RGB')
+#             os.remove(f+e)
+#             rgb_im.save(f+'.png')
+#         # resized.save(f + 'new', 'JPEG', quality=90)
 
 
 print('Loading known faces...')
@@ -53,6 +53,8 @@ known_names = []
 
 # We oranize known faces as subfolders of KNOWN_FACES_DIR
 # Each subfolder's name becomes our label (name)
+
+# Could prolly only process known faces if there is a change in fir files
 for name in os.listdir(KNOWN_FACES_DIR):
 
     # Next we load every file of faces of known person
@@ -63,8 +65,11 @@ for name in os.listdir(KNOWN_FACES_DIR):
         image = face_recognition.load_image_file(f'{KNOWN_FACES_DIR}/{name}/{filename}')
 
         # Get 128-dimension face encoding
-        # Always returns a list of found faces, for this purpose we take first face only (assuming one face per image as you can't be twice on one image)
-        encoding = face_recognition.face_encodings(image)[0]
+        # (assuming one face per image as you can't be twice on one image)
+        try:
+            encoding = face_recognition.face_encodings(image)[0]
+        except:
+            print("No face found in image")  #Also add code to delete image
 
         # Append encodings and name
         known_faces.append(encoding)
